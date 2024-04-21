@@ -101,28 +101,34 @@ function main() {
 
   const mtlLoader = new MTLLoader();
   const objLoader = new OBJLoader();
-  mtlLoader.load("resources/models/cat.mtl", (mtl) => {
+
+  mtlLoader.load("resources/models/cat.mtl", function (mtl) {
     mtl.preload();
     objLoader.setMaterials(mtl);
-    objLoader.load("resources/models/cat.obj", (root) => {
-      root.position.set(0, 0, -5);
-      root.scale.set(10, 10, 10);
-      root.rotation.set(0, Math.PI / 2, 0);
-      scene.add(root);
-      cat = root;
+    objLoader.load("resources/models/cat.obj", function (root) {
+      initializeCat(root);
+      animate();
     });
   });
 
-  // rendering
+  function initializeCat(root) {
+    root.position.set(0, 0, 0);
+    root.scale.set(0.5, 0.5, 0.5);
+    root.rotation.set(0, 180, 0);
+    scene.add(root);
+    cat = root;
+  }
+
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
+    const clientWidth = canvas.clientWidth;
+    const clientHeight = canvas.clientHeight;
+    const model =
+      canvas.width !== clientWidth || canvas.height !== clientHeight;
+    if (model) {
+      renderer.setSize(clientWidth, clientHeight, false);
     }
-    return needResize;
+    return model;
   }
 
   function render(time) {
@@ -130,15 +136,16 @@ function main() {
 
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      const aspectRatio = canvas.clientWidth / canvas.clientHeight;
+      camera.aspect = aspectRatio;
       camera.updateProjectionMatrix();
     }
 
-    cubes.forEach((cube, ndx) => {
-      const speed = 1 + ndx * 0.1;
-      const rot = time * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
+    cubes.forEach(function (cube, index) {
+      const speed = 1 + index * 0.1;
+      const rotation = time * speed;
+      cube.rotation.x = rotation;
+      cube.rotation.y = rotation;
     });
 
     if (cat) cat.rotation.y += 0.01;
@@ -149,26 +156,6 @@ function main() {
   }
 
   requestAnimationFrame(render);
-
-  // // render the cubes
-  // function render(time) {
-  //   time *= 0.001; // convert time to seconds
-
-  //   cubes.forEach((cube, ndx) => {
-  //     const speed = 1 + ndx * 0.1;
-  //     const rot = time * speed;
-  //     cube.rotation.x = rot;
-  //     cube.rotation.y = rot;
-  //   });
-
-  //   renderer.render(scene, camera);
-
-  //   requestAnimationFrame(render);
-  // }
-
-  // console.log("hi again")
-
-  // requestAnimationFrame(render);
 }
 
 main();
