@@ -100,7 +100,7 @@ function main() {
   const mtlLoader = new MTLLoader();
   const objLoader = new OBJLoader();
 
-  console.log("hi")
+  console.log("hello")
 
     // mtlLoader.load("resources/models/po.mtl", (mtl) => {
     // mtl.preload();
