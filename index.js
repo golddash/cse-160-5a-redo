@@ -93,34 +93,46 @@ function main() {
   cylinder.position.set(0, 1, -5);
   scene.add(cylinder);
 
-
   // Load 3D model
-  let po;
+
+  console.log("hello");
+
+  let cat;
 
   const mtlLoader = new MTLLoader();
   const objLoader = new OBJLoader();
+  mtlLoader.load("resources/models/cat.mtl", (mtl) => {
+    mtl.preload();
+    objLoader.setMaterials(mtl);
+    objLoader.load("resources/models/cat.obj", (root) => {
+      root.position.set(0, 0, -5);
+      root.scale.set(10, 10, 10);
+      root.rotation.set(0, Math.PI / 2, 0);
+      scene.add(root);
+      cat = root;
+    });
+  });
 
-  console.log("hello")
+  // rendering
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
 
-    // mtlLoader.load("resources/models/po.mtl", (mtl) => {
-    // mtl.preload();
-    // objLoader.setMaterials(mtl);
-    // objLoader.load("resources/models/po.obj", (root) => {
-    //     root.position.set(5, 0, -5);
-    //     root.scale.set(1, 1, 1);
-    //     root.rotation.set(0, 0, 0);
-    //     scene.add(root);
-    //     po = root;
-    // }, undefined, (error) => {
-    //     console.error('An error occurred while loading the OBJ file:', error);
-    // });
-    // }, undefined, (error) => {
-    // console.error('An error occurred while loading the MTL file:', error);
-    // });
-
-  // render the cubes
   function render(time) {
     time *= 0.001; // convert time to seconds
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
 
     cubes.forEach((cube, ndx) => {
       const speed = 1 + ndx * 0.1;
@@ -129,14 +141,34 @@ function main() {
       cube.rotation.y = rot;
     });
 
+    if (cat) cat.rotation.y += 0.01;
+
     renderer.render(scene, camera);
 
     requestAnimationFrame(render);
   }
 
-  console.log("hi again")
-
   requestAnimationFrame(render);
+
+  // // render the cubes
+  // function render(time) {
+  //   time *= 0.001; // convert time to seconds
+
+  //   cubes.forEach((cube, ndx) => {
+  //     const speed = 1 + ndx * 0.1;
+  //     const rot = time * speed;
+  //     cube.rotation.x = rot;
+  //     cube.rotation.y = rot;
+  //   });
+
+  //   renderer.render(scene, camera);
+
+  //   requestAnimationFrame(render);
+  // }
+
+  // console.log("hi again")
+
+  // requestAnimationFrame(render);
 }
 
 main();
